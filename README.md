@@ -2,5 +2,5 @@
 
 - Implementing different techniques to solve sudoku puzzles
 
-####### Vision
+###### Vision
  - Implement working sudoku game
