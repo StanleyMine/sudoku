@@ -106,9 +106,9 @@ int solvePuzzle()
                     c = col + subCol;
 
                     if (puzzle[r][c] != 0)
-                    { // filled in values have been skipped, so this is only checking values that have been assigned
+                    {
                         if (contains[puzzle[r][c] - 1])
-                            return 0;
+                            return FALSE;
                         contains[puzzle[r][c] - 1] = TRUE;
                     }
                 }
