@@ -1,15 +1,19 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int solvePuzzle(int puzzle[9][9]);
-int isPuzzleEmpty(int puzzle[9][9]);
-int isNumberRepeat(int puzzle[9][9], int num, int col, int row);
-int checkBox(int puzzle[9][9], int row, int col, int num);
+#define FALSE (1 == 0)
+#define TRUE (1 == 1)
+
+int puzzle[9][9];
+
+int solvePuzzle();
+int backtrack(int r, int c);
+void printboard();
 
 int main()
 {
     // assume given grid of 9x9 we need to first solve it
-    int puzzle[9][9];
+
     FILE *fp = fopen("EazyPuzzle.txt", "r");
 
     for (int i = 0; i < 9; i++)
@@ -29,51 +33,133 @@ int main()
 
     // reading in puzzle correctly from file, now to implement solving technique
 
-    return 1;
+    if (backtrack(0, 0))
+    {
+        printboard();
+    }
+    else
+    {
+        printf("No solution found\n");
+    }
+
+    return 0;
 }
 
-// Using backtrack algo to solve puzzle
-int solvePuzzle(int puzzle[9][9])
+// Using backtrack algo to solve puzzle, 1 means puzzle is solved
+int solvePuzzle()
 {
+    int row, col, subRow, subCol, value, r, c;
+
+    for (row = 0; row < 9; row++)
+    { // int array of all values being in row being assigned
+        int contains[9];
+        for (value = 0; value < 9; value++)
+        {
+            contains[value] = FALSE;
+        }
+
+        for (col = 0; col < 9; col++)
+        {
+            if (puzzle[row][col] != 0)
+            {
+                if (contains[puzzle[row][col] - 1])
+                    return FALSE;
+            }
+            contains[puzzle[row][col] - 1] = TRUE;
+        }
+    }
+
+    for (col = 0; col < 9; col++)
+    {
+        int contains[9];
+        for (value = 0; value < 9; value++)
+        { // int array of all values being in col being assigned
+            contains[value] = FALSE;
+        }
+
+        for (row = 0; row < 9; row++)
+        {
+            if (puzzle[row][col] != 0)
+            {
+                if (contains[puzzle[row][col] - 1] == 1)
+                    return FALSE;
+            }
+            contains[puzzle[row][col] - 1] = TRUE;
+        }
+    }
+
+    for (subRow = 0; subRow < 9; subRow += 3)
+    {
+        for (subCol = 0; subCol < 9; subCol += 3)
+        { // same idea, array of nums 1-9 with 1 for existence
+            int contains[9];
+            for (value = 0; value < 9; value++)
+            {
+                contains[value] = FALSE;
+            }
+
+            for (row = 0; row < 3; row++)
+            {
+                for (col = 0; col < 3; col++)
+                {
+                    r = row + subRow;
+                    c = col + subCol;
+
+                    if (puzzle[r][c] != 0)
+                    {
+                        if (contains[puzzle[r][c] - 1])
+                            return 0;
+                        contains[puzzle[r][c] - 1] = TRUE;
+                    }
+                }
+            }
+        }
+    }
+
+    return TRUE;
 }
 
-// Function to check if puzzle is empty, and returns 1 when puzzle has empty squares
-int isPuzzleEmpty(int puzzle[9][9])
+int backtrack(int r, int c)
+{
+    if (!solvePuzzle())
+    {
+        return FALSE;
+    }
+
+    if (c == 9)
+    {
+        return backtrack(r + 1, 0);
+    }
+    if (r == 9)
+    {
+        return TRUE;
+    }
+    if (puzzle[r][c] != 0)
+    {
+        return backtrack(r, c + 1);
+    }
+
+    int attempt;
+    for (attempt = 1; attempt <= 9; attempt++)
+    {
+        puzzle[r][c] = attempt;
+        if (backtrack(r, c + 1) == 1)
+        {
+            return TRUE;
+        }
+        puzzle[r][c] = 0;
+    }
+    return FALSE;
+}
+
+void printboard()
 {
     for (int i = 0; i < 9; i++)
     {
         for (int j = 0; j < 9; j++)
         {
-            if (puzzle[i][j] == 0)
-            {
-                return 1;
-            }
+            printf("%d ", puzzle[i][j]);
         }
+        printf("\n");
     }
-    return 0;
-}
-
-// Function to check if number is valid, returns 1 if number is not valid
-int isNumberRepeat(int puzzle[9][9], int num, int col, int row)
-{
-    for (int i = 0; i < 9; i++)
-    { // checking row and col
-        if (num == puzzle[row][i] || num == puzzle[i][col])
-            return 1;
-    }
-    return 0;
-}
-
-// Checking 3x3 box for matching number, per sudoku rules
-int checkBox(int puzzle[9][9], int row, int col, int num)
-{
-    for (int i = 0; i < 3; i++)
-    {
-        for (int j = 0; j < 3; j++)
-        {
-            if (puzzle[row + i][col + j] == num)
-                return 1;
-        }
-    }
-    return 0;
 }
