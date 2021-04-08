@@ -14,7 +14,7 @@ int main()
 {
     // assume given grid of 9x9 we need to first solve it
 
-    FILE *fp = fopen("EazyPuzzle.txt", "r");
+    FILE *fp = fopen("OutputPuzzle.txt", "r");
 
     for (int i = 0; i < 9; i++)
     {
